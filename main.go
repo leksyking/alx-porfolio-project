@@ -20,6 +20,7 @@ func main() {
 	//routes
 	routes.AuthRouter(server)
 	routes.UserRouter(server)
+	routes.RoomsRouter(server)
 	server.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Welcome to Go Video chat and streaming")
 	})
