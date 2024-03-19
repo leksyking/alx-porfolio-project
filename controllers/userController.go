@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leksyking/go-authentication/utils"
+	"github.com/leksyking/alx-porfolio-project/utils"
 )
 
 func ShowUser(c *gin.Context) {

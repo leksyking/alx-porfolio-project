@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/leksyking/go-authentication/routes"
+	"github.com/leksyking/alx-porfolio-project/routes"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 	routes.AuthRouter(server)
 	routes.UserRouter(server)
 	server.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "Welcome to Go Authentication")
+		c.JSON(http.StatusOK, "Welcome to Go Video chat and streaming")
 	})
 
 	port := os.Getenv("PORT")

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leksyking/go-authentication/models"
-	"github.com/leksyking/go-authentication/utils"
+	"github.com/leksyking/alx-porfolio-project/models"
+	"github.com/leksyking/alx-porfolio-project/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

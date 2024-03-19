@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leksyking/go-authentication/wait"
+	"github.com/leksyking/alx-porfolio-project/wait"
 )
 
 var (

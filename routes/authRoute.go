@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/leksyking/go-authentication/controllers"
-	"github.com/leksyking/go-authentication/middlewares"
+	"github.com/leksyking/alx-porfolio-project/controllers"
+	"github.com/leksyking/alx-porfolio-project/middlewares"
 )
 
 func AuthRouter(route *gin.Engine) {

@@ -11,9 +11,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/leksyking/go-authentication/models"
-	"github.com/leksyking/go-authentication/utils"
-	"github.com/leksyking/go-authentication/wait"
+	"github.com/leksyking/alx-porfolio-project/models"
+	"github.com/leksyking/alx-porfolio-project/utils"
+	"github.com/leksyking/alx-porfolio-project/wait"
 	"github.com/shomali11/util/xhashes"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
