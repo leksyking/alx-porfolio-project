@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -29,7 +30,7 @@ func broadcaster() {
 			if client.Conn != msg.Client {
 				err := client.Conn.WriteJSON(msg.Message)
 				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": "Error sending message to the room!"})
+					log.Fatal("Error sending messages to the room!")
 					client.Conn.Close()
 				}
 			}
@@ -44,6 +45,7 @@ func CreateRoomRequestHandler(c *gin.Context) {
 
 // JoinRoomRequestHandler: join a room
 func JoinRoomRequestHandler(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	var _, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	roomID := c.Query("roomID")
@@ -59,15 +61,18 @@ func JoinRoomRequestHandler(c *gin.Context) {
 	}
 
 	AllRooms.InsertIntoRoom(roomID, false, ws)
-	go broadcaster()
+	go broadcaster() // listen for messages
+
+	// broadcast the message
 	for {
 		var msg broadcastMsg
 		err := ws.ReadJSON(&msg.Message)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "E"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error reading the message!"})
 		}
 		msg.Client = ws
 		msg.RoomID = roomID
+
+		broadcast <- msg
 	}
-	c.JSON(http.StatusOK, gin.H{"msg": "You have joined the room"})
 }
