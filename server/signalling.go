@@ -40,12 +40,11 @@ func broadcaster() {
 // CreateRoomRequestHandler create a room and return a roon ID
 func CreateRoomRequestHandler(c *gin.Context) {
 	roomID := AllRooms.CreateRoom()
-	c.JSON(http.StatusCreated, gin.H{"msg": "Room has  been created", "roomID": roomID})
+	c.JSON(http.StatusCreated, gin.H{"msg": "Room has  been created", "room_id": roomID})
 }
 
 // JoinRoomRequestHandler: join a room
 func JoinRoomRequestHandler(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
 	var _, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	roomID := c.Query("roomID")
@@ -56,6 +55,7 @@ func JoinRoomRequestHandler(c *gin.Context) {
 
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "websocket upgrade error!"})
 		return
 	}

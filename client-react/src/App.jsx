@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import CreateRoom from "./components/CreateRoom";
 import Room from "./components/Room";
@@ -7,7 +7,7 @@ function App() {
         return (
                 <div className="App">
                         <BrowserRouter>
-                                <Switch>
+                                <Routes>
                                         <Route
                                                 path="/"
                                                 Component={CreateRoom}
@@ -16,7 +16,7 @@ function App() {
                                                 path="/room/:roomID"
                                                 Component={Room}
                                         ></Route>
-                                </Switch>
+                                </Routes>
                         </BrowserRouter>
                 </div>
         );

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/leksyking/alx-porfolio-project/routes"
@@ -18,9 +19,7 @@ func main() {
 	server.AllRooms.Init()
 
 	app := gin.New()
-	app.Use(gin.Logger(), gin.Recovery())
-
-	//routes
+	app.Use(gin.Logger(), gin.Recovery(), cors.Default())
 	routes.AuthRouter(app)
 	routes.UserRouter(app)
 	routes.RoomsRouter(app)
