@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateRoom = (props) => {
+        const navigate = useNavigate();
         const create = async (e) => {
                 e.preventDefault();
 
@@ -9,7 +11,7 @@ const CreateRoom = (props) => {
                 );
                 const { room_id } = await resp.json();
 
-                props.history.push(`/room/${room_id}`);
+                navigate(`/room/${room_id}`);
         };
         return (
                 <div>
