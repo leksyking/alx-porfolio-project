@@ -1,10 +1,9 @@
 package server
 
 import (
-	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -24,6 +23,7 @@ type broadcastMsg struct {
 }
 var broadcast = make(chan broadcastMsg)
 func broadcaster() {
+	fmt.Println("hello")
 	for {
 		msg := <- broadcast
 		for _, client := range AllRooms.Map[msg.RoomID]{
@@ -45,8 +45,8 @@ func CreateRoomRequestHandler(c *gin.Context) {
 
 // JoinRoomRequestHandler: join a room
 func JoinRoomRequestHandler(c *gin.Context) {
-	var _, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-	defer cancel()
+	// var _, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	// defer cancel()
 	roomID := c.Query("roomID")
 	if roomID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "roomID is missing in the URL"})
@@ -72,7 +72,7 @@ func JoinRoomRequestHandler(c *gin.Context) {
 		}
 		msg.Client = ws
 		msg.RoomID = roomID
-
+		log.Println(msg.Message)
 		broadcast <- msg
 	}
 }
