@@ -113,6 +113,17 @@ const Room = () => {
                         if (message.join) {
                                 callUser();
                         }
+                        if (message.offer) {
+                                handleOffer(message.offer);
+                        }
+                        if (message.answer) {
+                                console.log("Receiving answer");
+                                peerRef.current.setRemoteDescription(
+                                        new RTCSessionDescription(
+                                                message.answer
+                                        )
+                                );
+                        }
                         if (message.iceCandidate) {
                                 console.log(
                                         "Received and Adding ICE Candidate"
@@ -127,9 +138,6 @@ const Room = () => {
                                                 error
                                         );
                                 }
-                        }
-                        if (message.offer) {
-                                handleOffer(message.offer);
                         }
                 });
         });
