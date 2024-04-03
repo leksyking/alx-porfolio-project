@@ -20,8 +20,6 @@ func main() {
 
 	app := gin.New()
 	app.Use(gin.Logger(), gin.Recovery(), cors.Default())
-	routes.AuthRouter(app)
-	routes.UserRouter(app)
 	routes.RoomsRouter(app)
 	app.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Welcome to Go Video chat and streaming")

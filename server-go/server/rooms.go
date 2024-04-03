@@ -51,9 +51,6 @@ func (r *RoomMap) CreateRoom() string {
 
 // InsertIntoRoom: create a participant and add into the hashMap
 func (r *RoomMap) InsertIntoRoom(roomID string, host bool, conn *websocket.Conn) {
-	// r.Mutex.Lock()
-	// defer r.Mutex.RUnlock()
-
 	participant := Participant{host, conn}
 
 	log.Println("Inserting into room, RoomID: ", roomID)
