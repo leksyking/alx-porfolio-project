@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
 
-const Room = () => {
-        const { roomID } = useParams();
+const Room = (props) => {
         const userVideo = useRef();
         const userStream = useRef();
         const partnerVideo = useRef();
@@ -25,55 +23,65 @@ const Room = () => {
                 }
         };
 
-        const handleIceCandidateEvent = async () => {
-                console.log("Creating offer...");
-                try {
-                        const myOffer = peerRef.current.createOffer();
-                        await peerRef.current.setLocalDescription(myOffer);
+        useEffect(() => {
+                openCamera().then((stream) => {
+                        userVideo.current.srcObject = stream;
+                        userStream.current = stream;
 
-                        webSocketRef.current.send(
-                                JSON.stringify({
-                                        offer: peerRef.current.LocalDescription,
-                                })
+                        webSocketRef.current = new WebSocket(
+                                `ws://localhost:8080/api/v1/room/join?roomID=${props.match.params.roomID}`
                         );
-                } catch (error) {}
-        };
-        const handleNegotiationNeeded = async (e) => {
-                console.log("Found Ice Candidate");
-                if (e.candidate) {
-                        console.log(e.candidate);
-                        webSocketRef.current.send({
-                                iceCandidate: e.candidate,
+
+                        webSocketRef.current.addEventListener("open", () => {
+                                webSocketRef.current.send(
+                                        JSON.stringify({ join: true })
+                                );
                         });
-                }
-        };
-        const handleTrackEvent = async (e) => {
-                console.log("Received Tracks");
-                partnerVideo.current.srcObject = e.streams[0];
-        };
 
-        const createPeer = () => {
-                console.log("creating peer connection...");
-                const peer = new RTCPeerConnection({
-                        iceServers: [{ urls: "'stun:stun.l.google.com:19302" }],
+                        webSocketRef.current.addEventListener(
+                                "message",
+                                async (e) => {
+                                        const message = JSON.parse(e.data);
+
+                                        if (message.join) {
+                                                callUser();
+                                        }
+
+                                        if (message.offer) {
+                                                handleOffer(message.offer);
+                                        }
+
+                                        if (message.answer) {
+                                                console.log("Receiving Answer");
+                                                peerRef.current.setRemoteDescription(
+                                                        new RTCSessionDescription(
+                                                                message.answer
+                                                        )
+                                                );
+                                        }
+
+                                        if (message.iceCandidate) {
+                                                console.log(
+                                                        "Receiving and Adding ICE Candidate"
+                                                );
+                                                try {
+                                                        await peerRef.current.addIceCandidate(
+                                                                message.iceCandidate
+                                                        );
+                                                } catch (err) {
+                                                        console.log(
+                                                                "Error Receiving ICE Candidate",
+                                                                err
+                                                        );
+                                                }
+                                        }
+                                }
+                        );
                 });
-                peer.onicecandidate = handleNegotiationNeeded;
-                peer.onnegotiationneeded = handleIceCandidateEvent;
-                peer.ontrack = handleTrackEvent;
+        });
 
-                return peer;
-        };
-
-        const callUser = () => {
-                console.log("Calling other users...");
-                peerRef.current = createPeer();
-
-                userStream.current.getTracks().forEach((track) => {
-                        peerRef.current.addTrack(track, userStream.current);
-                });
-        };
         const handleOffer = async (offer) => {
-                console.log("Received offer, now creating answer...");
+                console.log("Received Offer, Creating Answer");
                 peerRef.current = createPeer();
 
                 await peerRef.current.setRemoteDescription(
@@ -94,53 +102,58 @@ const Room = () => {
                 );
         };
 
-        useEffect(() => {
-                openCamera().then((stream) => {
-                        userVideo.current.srcObject = stream;
-                        userStream.current = stream;
+        const callUser = () => {
+                console.log("Calling Other User");
+                peerRef.current = createPeer();
+
+                userStream.current.getTracks().forEach((track) => {
+                        peerRef.current.addTrack(track, userStream.current);
+                });
+        };
+
+        const createPeer = () => {
+                console.log("Creating Peer Connection");
+                const peer = new RTCPeerConnection({
+                        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
                 });
 
-                webSocketRef.current = new WebSocket(
-                        `ws://localhost:8080/api/v1/room/join?roomID=${roomID}`
-                );
-                webSocketRef.current.addEventListener("open", () => {
+                peer.onnegotiationneeded = handleNegotiationNeeded;
+                peer.onicecandidate = handleIceCandidateEvent;
+                peer.ontrack = handleTrackEvent;
+
+                return peer;
+        };
+
+        const handleNegotiationNeeded = async () => {
+                console.log("Creating Offer");
+
+                try {
+                        const myOffer = await peerRef.current.createOffer();
+                        await peerRef.current.setLocalDescription(myOffer);
+
                         webSocketRef.current.send(
-                                JSON.stringify({ join: "true" })
+                                JSON.stringify({
+                                        offer: peerRef.current.localDescription,
+                                })
                         );
-                });
-                webSocketRef.current.addEventListener("message", async (e) => {
-                        const message = JSON.parse(e.data);
-                        if (message.join) {
-                                callUser();
-                        }
-                        if (message.offer) {
-                                handleOffer(message.offer);
-                        }
-                        if (message.answer) {
-                                console.log("Receiving answer");
-                                peerRef.current.setRemoteDescription(
-                                        new RTCSessionDescription(
-                                                message.answer
-                                        )
-                                );
-                        }
-                        if (message.iceCandidate) {
-                                console.log(
-                                        "Received and Adding ICE Candidate"
-                                );
-                                try {
-                                        await peerRef.current.addIceCandidate(
-                                                message.iceCandidate
-                                        );
-                                } catch (error) {
-                                        console.log(
-                                                "Error Receiving ICE Candidate",
-                                                error
-                                        );
-                                }
-                        }
-                });
-        });
+                } catch (err) {}
+        };
+
+        const handleIceCandidateEvent = (e) => {
+                console.log("Found Ice Candidate");
+                if (e.candidate) {
+                        console.log(e.candidate);
+                        webSocketRef.current.send(
+                                JSON.stringify({ iceCandidate: e.candidate })
+                        );
+                }
+        };
+
+        const handleTrackEvent = (e) => {
+                console.log("Received Tracks");
+                partnerVideo.current.srcObject = e.streams[0];
+        };
+
         return (
                 <div>
                         <video autoPlay controls={true} ref={userVideo}></video>
@@ -152,4 +165,5 @@ const Room = () => {
                 </div>
         );
 };
+
 export default Room;
