@@ -66,7 +66,7 @@ This project aims to build a video chat application using WebRTC technology on t
 
 1. Create a room by clicking the "Create Room" button.
 2. Share the room ID with others to join the same room.
-3. Users can join the room by entering the room ID and clicking the join button.
+3. Users can join the room by entering the room link in the browser.
 
 ## Contributors
 
